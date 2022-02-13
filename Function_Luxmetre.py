@@ -104,7 +104,7 @@ def data_collect(rge):
         if rge1 != rge:
             print("Measurement out of range, value not taken into account")
             time.sleep(0.5)
-            return False
+            return "Value not to take into account"
         else :
             data = ln.decode('utf-8')[9:15]
             measure1 = data[1:5]
