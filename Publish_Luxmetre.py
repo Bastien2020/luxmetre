@@ -14,8 +14,8 @@ if __name__ == '__main__':
 	rospy.init_node('luxmetre_publisher')
 	pub = rospy.Publisher("/luxmetre", String, queue_size=10)
 	rate = rospy.Rate(2)
-	file = open("data_luxmetre.csv", "w")
-	file.write("timestamp" + "," + "Lux" + "\n")
+	#file = open("data_luxmetre.csv", "w")
+	#file.write("timestamp" + "," + "Lux" + "\n")
 
 	while not rospy.is_shutdown():
 		# récupération de la mesure d'éclairement
@@ -25,6 +25,7 @@ if __name__ == '__main__':
 		pub.publish(msg)
 		
 		#enregistrement de la mesure dans un fichier 
+		"""
 		now = datetime.now()
 		timestamp = datetime.timestamp(now)
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
 			file.write(str(timestamp) + "," + measure + "\n")
 		except:
 			pass
-
+		"""
 		rate.sleep()
 
 	rospy.loginfo("Node was stopped")
