@@ -77,9 +77,11 @@ def mode_PC_activation():
     time.sleep(0.75)
     ser.reset_input_buffer()
     ser.reset_output_buffer()
+    # Set measurement conditions
+    for x in range(2):
+        ser.write(buildMsgString('0%d100300' % (x)).encode('utf-8'))
+        ln = ser.readline()
 
-    ser.write(buildMsgString('00100300').encode('utf-8'))
-    ln = ser.readline()
 
     # Identification du Range et de l'activation correcte ou non du mode PC
     rge = ln.decode('utf-8')[7]
@@ -95,23 +97,45 @@ def mode_PC_activation():
         return False
 
 def data_collect(rge):
-    ser.write(buildMsgString('00100300').encode('utf-8'))
-    ln = ser.readline()
-    error = ln.decode('utf-8')[6]
-    rge1 = ln.decode('utf-8')[7]
-    #print(rge)
-    if error_processing(error) == True:
-        if rge1 != rge:
-            print("Measurement out of range, value not taken into account")
-            time.sleep(0.5)
-            return "Value not to take into account"
-        else :
-            data = ln.decode('utf-8')[9:15]
-            measure1 = data[1:5]
-            exp = data[5] 
-            measure2 = int(measure1)*10**(-4+int(exp))
-            measure3 = str(measure2)
-            return measure3
-    else:
-        print("Measurement error")
-        return False
+
+    #msg = ""
+    msg = []
+    for x in range(0, 2):
+        ser.write(buildMsgString('0%d100300' % (x)).encode('utf-8'))
+        print(x)
+        ln = ser.readline()
+        ts = time.time()
+        print(type(ts))
+        error = ln.decode('utf-8')[6]
+        rge1 = ln.decode('utf-8')[7]
+        #print(rge)
+        if error_processing(error) == True:
+            if rge1 != rge:
+                print("Measurement out of range, value not taken into account")
+                time.sleep(0.5)
+                return "Value not to take into account"
+            else :
+                data = ln.decode('utf-8')[9:15]
+                measure1 = data[1:5]
+                exp = data[5]
+                measure2 = int(measure1)*10**(-4+int(exp))
+                measure3 = str(measure2)
+                #msg = msg +" "+ measure3 + " numero_lux" + " " + str(x)
+                #msg = msg.append(ts)
+                #msg = msg.append(x)
+                #msg = msg.append(measure2)
+                msg.extend([ts, x, measure2])
+                print(msg)
+                #return measure3 + " numero_lux" + " " + str(x) + "espace" +#+ str(ts)
+                #if x == 1:
+                #    return msg
+        else:
+            print("Measurement error")
+            return False
+    return msg
+
+"""
+    #Set the HOLD Status
+    ser.write(buildMsgString('99551  0').encode('utf-8'))
+    time.sleep(0.75)
+"""
